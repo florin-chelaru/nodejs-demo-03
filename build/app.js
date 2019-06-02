@@ -40,6 +40,7 @@ var spanner_1 = require("@google-cloud/spanner");
 // Create a new express application instance
 var app = express();
 // const projectId: string = 'florinc-test-project-2';
+console.log('The value of GOOGLE_APPLICATION_CREDENTIALS is:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
 app.get('/', function (req, res) {
     return __awaiter(this, void 0, void 0, function () {
         var rows;
@@ -47,8 +48,9 @@ app.get('/', function (req, res) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, listBooks()];
                 case 1:
-                    rows = (_a.sent())[0];
-                    res.send(rows.toString());
+                    rows = _a.sent();
+                    console.log(rows);
+                    res.send(rows);
                     return [2 /*return*/];
             }
         });
