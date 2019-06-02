@@ -35,51 +35,42 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var express = require("express");
+// Imports the Google Cloud client library
 var spanner_1 = require("@google-cloud/spanner");
-// Create a new express application instance
-var app = express();
-// const projectId: string = 'florinc-test-project-2';
-app.get('/', function (req, res) {
+function createDatabase(databaseId, instanceId, projectId) {
+    if (databaseId === void 0) { databaseId = 'nodejs-demo-03'; }
+    if (instanceId === void 0) { instanceId = 'nodejs-demo-03'; }
+    if (projectId === void 0) { projectId = 'florinc-test-project-2'; }
     return __awaiter(this, void 0, void 0, function () {
-        var rows;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, listBooks()];
+        var spanner, instance, request, _a, database, operation;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    console.log("projectId: " + projectId);
+                    console.log("instanceId: " + instanceId);
+                    console.log("databaseId: " + databaseId);
+                    spanner = new spanner_1.Spanner({
+                        projectId: projectId,
+                    });
+                    instance = spanner.instance(instanceId);
+                    request = {
+                        schema: [
+                            "CREATE TABLE Books (\n      BookId STRING(MAX) NOT NULL,\n      Description STRING(MAX),\n      Title STRING(MAX),\n    ) PRIMARY KEY (BookId)",
+                            "CREATE TABLE Chapters (\n      BookId STRING(MAX) NOT NULL,\n      ChapterId STRING(MAX) NOT NULL,\n      Description STRING(MAX),\n      Page INT64,\n      Title STRING(MAX),\n    ) PRIMARY KEY (BookId, ChapterId),\n    INTERLEAVE IN PARENT Books ON DELETE CASCADE",
+                        ],
+                    };
+                    return [4 /*yield*/, instance.createDatabase(databaseId, request)];
                 case 1:
-                    rows = (_a.sent())[0];
-                    res.send(rows.toString());
+                    _a = _b.sent(), database = _a[0], operation = _a[1];
+                    console.log("Waiting for operation on " + database.id + " to complete...");
+                    return [4 /*yield*/, operation.promise()];
+                case 2:
+                    _b.sent();
+                    console.log("Created database " + databaseId + " on instance " + instanceId + ".");
                     return [2 /*return*/];
             }
         });
     });
-});
-app.listen(3000, function () {
-    console.log('Example app listening on port 3000!');
-});
-function listBooks(projectId, instanceId, databaseId) {
-    if (projectId === void 0) { projectId = 'florinc-test-project-2'; }
-    if (instanceId === void 0) { instanceId = 'nodejs-demo-03'; }
-    if (databaseId === void 0) { databaseId = 'nodejs-demo-03'; }
-    return __awaiter(this, void 0, void 0, function () {
-        var spanner, instance, database, query, rows;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    spanner = new spanner_1.Spanner({
-                        projectId: projectId
-                    });
-                    instance = spanner.instance(instanceId);
-                    database = instance.database(databaseId);
-                    query = {
-                        sql: 'SELECT * FROM Books',
-                    };
-                    return [4 /*yield*/, database.run(query)];
-                case 1:
-                    rows = (_a.sent())[0];
-                    console.log("Query: " + rows.length + " found.");
-                    return [2 /*return*/, rows.map(function (row) { return row.toJSON(); })];
-            }
-        });
-    });
 }
+var args = process.argv.slice(2);
+createDatabase.apply(void 0, args).catch(console.error);

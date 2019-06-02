@@ -35,29 +35,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var express = require("express");
 var spanner_1 = require("@google-cloud/spanner");
-// Create a new express application instance
-var app = express();
-// const projectId: string = 'florinc-test-project-2';
-app.get('/', function (req, res) {
-    return __awaiter(this, void 0, void 0, function () {
-        var rows;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, listBooks()];
-                case 1:
-                    rows = (_a.sent())[0];
-                    res.send(rows.toString());
-                    return [2 /*return*/];
-            }
-        });
-    });
-});
-app.listen(3000, function () {
-    console.log('Example app listening on port 3000!');
-});
-function listBooks(projectId, instanceId, databaseId) {
+function quickstart(projectId, instanceId, databaseId) {
     if (projectId === void 0) { projectId = 'florinc-test-project-2'; }
     if (instanceId === void 0) { instanceId = 'nodejs-demo-03'; }
     if (databaseId === void 0) { databaseId = 'nodejs-demo-03'; }
@@ -66,9 +45,7 @@ function listBooks(projectId, instanceId, databaseId) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    spanner = new spanner_1.Spanner({
-                        projectId: projectId
-                    });
+                    spanner = new spanner_1.Spanner({ projectId: projectId });
                     instance = spanner.instance(instanceId);
                     database = instance.database(databaseId);
                     query = {
@@ -78,8 +55,11 @@ function listBooks(projectId, instanceId, databaseId) {
                 case 1:
                     rows = (_a.sent())[0];
                     console.log("Query: " + rows.length + " found.");
-                    return [2 /*return*/, rows.map(function (row) { return row.toJSON(); })];
+                    rows.forEach(function (row) { return console.log(row); });
+                    return [2 /*return*/];
             }
         });
     });
 }
+var args = process.argv.slice(2);
+quickstart.apply(void 0, args).catch(console.error);

@@ -35,51 +35,58 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var express = require("express");
+// Imports the Google Cloud client library
 var spanner_1 = require("@google-cloud/spanner");
-// Create a new express application instance
-var app = express();
-// const projectId: string = 'florinc-test-project-2';
-app.get('/', function (req, res) {
-    return __awaiter(this, void 0, void 0, function () {
-        var rows;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, listBooks()];
-                case 1:
-                    rows = (_a.sent())[0];
-                    res.send(rows.toString());
-                    return [2 /*return*/];
-            }
-        });
-    });
-});
-app.listen(3000, function () {
-    console.log('Example app listening on port 3000!');
-});
-function listBooks(projectId, instanceId, databaseId) {
+function populate(projectId, instanceId, databaseId) {
     if (projectId === void 0) { projectId = 'florinc-test-project-2'; }
     if (instanceId === void 0) { instanceId = 'nodejs-demo-03'; }
     if (databaseId === void 0) { databaseId = 'nodejs-demo-03'; }
     return __awaiter(this, void 0, void 0, function () {
-        var spanner, instance, database, query, rows;
+        var spanner, instance, database;
+        var _this = this;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    spanner = new spanner_1.Spanner({
-                        projectId: projectId
-                    });
-                    instance = spanner.instance(instanceId);
-                    database = instance.database(databaseId);
-                    query = {
-                        sql: 'SELECT * FROM Books',
-                    };
-                    return [4 /*yield*/, database.run(query)];
-                case 1:
-                    rows = (_a.sent())[0];
-                    console.log("Query: " + rows.length + " found.");
-                    return [2 /*return*/, rows.map(function (row) { return row.toJSON(); })];
-            }
+            spanner = new spanner_1.Spanner({
+                projectId: projectId,
+            });
+            instance = spanner.instance(instanceId);
+            database = instance.database(databaseId);
+            database.runTransaction(function (err, transaction) { return __awaiter(_this, void 0, void 0, function () {
+                var rowCount, err_1;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (err) {
+                                console.error(err);
+                                return [2 /*return*/];
+                            }
+                            _a.label = 1;
+                        case 1:
+                            _a.trys.push([1, 4, 5, 6]);
+                            return [4 /*yield*/, transaction.runUpdate({
+                                    sql: "INSERT Books (BookId, Title, Description) VALUES\n      ('master-margarita', 'The Master and Margarita', 'A book about cats and demons'),\n      ('the-idiot', 'The Idiot', 'The Idiot is a novel by the 19th-century Russian author Fyodor Dostoevsky.')",
+                                })];
+                        case 2:
+                            rowCount = (_a.sent())[0];
+                            console.log(rowCount + " records inserted.");
+                            return [4 /*yield*/, transaction.commit()];
+                        case 3:
+                            _a.sent();
+                            return [3 /*break*/, 6];
+                        case 4:
+                            err_1 = _a.sent();
+                            console.error('ERROR:', err_1);
+                            return [3 /*break*/, 6];
+                        case 5:
+                            // Close the database when finished.
+                            database.close();
+                            return [7 /*endfinally*/];
+                        case 6: return [2 /*return*/];
+                    }
+                });
+            }); });
+            return [2 /*return*/];
         });
     });
 }
+var args = process.argv.slice(2);
+populate.apply(void 0, args).catch(console.error);
