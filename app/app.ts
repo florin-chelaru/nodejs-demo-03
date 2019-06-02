@@ -8,8 +8,6 @@ const app: express.Application = express();
 
 // const projectId: string = 'florinc-test-project-2';
 
-console.log('The value of GOOGLE_APPLICATION_CREDENTIALS is:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
-
 app.get('/', async function (req, res) {
   // res.send('Hello World!');
   const rows = await listBooks();
@@ -18,6 +16,7 @@ app.get('/', async function (req, res) {
 });
 
 app.listen(3000, function () {
+  console.log('The value of GOOGLE_APPLICATION_CREDENTIALS is:', process.env.GOOGLE_APPLICATION_CREDENTIALS);
   console.log('Example app listening on port 3000!');
 });
 
