@@ -45,7 +45,10 @@ app.get('/', function (req, res) {
         var rows;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, listBooks()];
+                case 0:
+                    // res.send('Hello World!');
+                    res.setHeader('Access-Control-Allow-Origin', 'http://35.239.67.174');
+                    return [4 /*yield*/, listBooks()];
                 case 1:
                     rows = _a.sent();
                     console.log(rows);

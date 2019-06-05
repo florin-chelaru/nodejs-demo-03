@@ -10,6 +10,7 @@ const app: express.Application = express();
 
 app.get('/', async function (req, res) {
   // res.send('Hello World!');
+  res.setHeader('Access-Control-Allow-Origin', 'http://35.239.67.174');
   const rows = await listBooks();
   console.log(rows);
   res.send(rows);
